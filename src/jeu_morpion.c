@@ -11,7 +11,10 @@
 #include <time.h>
 
 // Paramètres du jeu
+#define NB_COLONNE  7
+#define NB_LIGNE    6
 #define LARGEUR_MAX 9 		// nb max de fils pour un noeud (= nb max de coups possibles)
+// #define LARGEUR_MAX NB_COLONNE
 
 #define TEMPS 5		// temps de calcul pour un coup avec MCTS (en secondes)
 
@@ -29,7 +32,9 @@ typedef struct EtatSt {
 	int joueur; // à qui de jouer ? 
 
 	// TODO: à compléter par la définition de l'état du jeu
-
+    /* plateau du puissance 4 */
+	// char plateau[6][7];
+	
 	/* par exemple, pour morpion: */
 	char plateau[3][3];	
 
@@ -38,7 +43,9 @@ typedef struct EtatSt {
 // Definition du type Coup
 typedef struct {
 	// TODO: à compléter par la définition d'un coup 
-
+    /* numéro de la colonne */
+    // int colonne;
+    
 	/* par exemple, pour morpion: */
 	int ligne;
 	int colonne;
