@@ -179,9 +179,9 @@ FinDePartie testFin( Etat * etat ) {
     // caractère courant
     char courant;
 
-    for(i = 0; i < NB_COLONNE; i++){
-        if(etat->nombre_pions[i] > 0){
-            for(j = 0; j < NB_LIGNE; j++){
+    for(j = 0; j < NB_COLONNE; j++){
+        if(etat->nombre_pions[j] > 0){
+            for(i = 0; i < NB_LIGNE; i++){
                 if(etat->plateau[i][j] != VIDE){
                     n++;
 
@@ -190,8 +190,7 @@ FinDePartie testFin( Etat * etat ) {
                         k = 0;
 
                         courant = etat->plateau[i][j];
-                        while( k < TAILLE_POUR_GAGNER && (j-k) >= 0 &&
-                              etat->plateau[i][j-k] == courant){
+                        while( k < TAILLE_POUR_GAGNER && etat->plateau[i][j-k] == courant){
                                 k++;
                         }
 
@@ -205,8 +204,7 @@ FinDePartie testFin( Etat * etat ) {
                         k = 0;
 
                         courant = etat->plateau[i][j];
-                        while( k < TAILLE_POUR_GAGNER && (i-k) >= 0 &&
-                              etat->plateau[i-k][j] == courant){
+                        while( k < TAILLE_POUR_GAGNER && etat->plateau[i-k][j] == courant){
                                 k++;
                         }
 
@@ -217,49 +215,37 @@ FinDePartie testFin( Etat * etat ) {
 
                     // diagonales
 
+                    // vers la gauche
+                    if(i >= (TAILLE_POUR_GAGNER - 1) && j >= (TAILLE_POUR_GAGNER - 1)){
+                        k = 0;
+
+                        courant = etat->plateau[i][j];
+                        while( k < TAILLE_POUR_GAGNER && etat->plateau[i-k][j-k] == courant){
+                                k++;
+                        }
+
+                        if(k == TAILLE_POUR_GAGNER){
+                            return courant == PION_1? ORDI_GAGNE : HUMAIN_GAGNE;
+                        }
+                    }
+
+                    // vers la droite
+                    if(i+(TAILLE_POUR_GAGNER) < NB_LIGNE && j >= (TAILLE_POUR_GAGNER - 1)){
+                        k = 0;
+
+                        courant = etat->plateau[i][j];
+                        while( k < TAILLE_POUR_GAGNER && etat->plateau[i+k][j-k] == courant){
+                                k++;
+                        }
+
+                        if(k == TAILLE_POUR_GAGNER){
+                            return courant == PION_1? ORDI_GAGNE : HUMAIN_GAGNE;
+                        }
+                    }
                 }
             }
         }
     }
-
-	/* par exemple	*/
-
-	// tester si un joueur a gagné
-	/*int i,j,k,n = 0;
-	for ( i=0;i < 3; i++) {
-		for(j=0; j < 3; j++) {
-			if ( etat->plateau[i][j] != ' ') {
-				n++;	// nb coups joués
-
-				// lignes
-				k=0;
-				while ( k < 3 && i+k < 3 && etat->plateau[i+k][j] == etat->plateau[i][j] )
-					k++;
-				if ( k == 3 )
-					return etat->plateau[i][j] == 'O'? ORDI_GAGNE : HUMAIN_GAGNE;
-
-				// colonnes
-				k=0;
-				while ( k < 3 && j+k < 3 && etat->plateau[i][j+k] == etat->plateau[i][j] )
-					k++;
-				if ( k == 3 )
-					return etat->plateau[i][j] == 'O'? ORDI_GAGNE : HUMAIN_GAGNE;
-
-				// diagonales
-				k=0;
-				while ( k < 3 && i+k < 3 && j+k < 3 && etat->plateau[i+k][j+k] == etat->plateau[i][j] )
-					k++;
-				if ( k == 3 )
-					return etat->plateau[i][j] == 'O'? ORDI_GAGNE : HUMAIN_GAGNE;
-
-				k=0;
-				while ( k < 3 && i+k < 3 && j-k >= 0 && etat->plateau[i+k][j-k] == etat->plateau[i][j] )
-					k++;
-				if ( k == 3 )
-					return etat->plateau[i][j] == 'O'? ORDI_GAGNE : HUMAIN_GAGNE;
-			}
-		}
-	}*/
 
 	// et sinon tester le match nul
 	if ( n == NB_COLONNE * NB_LIGNE )
@@ -286,12 +272,12 @@ int lancerJeu(){
 
 	// boucle de jeu
 	do {
-		printf("\n");
-		afficheJeu(etat);
 
 		if ( etat->joueur == 0 ) {
 			// tour de l'humain
 
+            printf("\n");
+            afficheJeu(etat);
 			do {
 				coup = demanderCoup();
 			} while ( !jouerCoup(etat, coup) );
@@ -299,8 +285,7 @@ int lancerJeu(){
 		}
 		else {
 			// tour de l'Ordinateur
-            etat->joueur = 0;
-			// ordijoue_mcts( etat, TEMPS );
+			ordijoue_mcts( etat, TEMPS );
 
 		}
 
@@ -311,11 +296,11 @@ int lancerJeu(){
 	afficheJeu(etat);
 
 	if ( fin == ORDI_GAGNE )
-		printf( "\n** L'ordinateur a gagné **\n");
+		printf( "\n** Victoire de l'ordinateur, vous avez perdu ! **\n");
 	else if ( fin == MATCHNUL )
 		printf("\n Match nul !  \n");
 	else
-		printf( "\n** BRAVO, l'ordinateur a perdu  **\n");
+		printf( "\n** BRAVO, vous avez battu l'ordinateur. **\n");
 
     sleep(1);
 	return 0;
