@@ -302,7 +302,6 @@ int lancerJeu(){
 	else
 		printf( "\n** BRAVO, vous avez battu l'ordinateur. **\n");
 
-    sleep(1);
 	return 0;
 }
 
