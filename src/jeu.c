@@ -248,10 +248,7 @@ FinDePartie testFin( Etat * etat ) {
     }
 
 	// et sinon tester le match nul
-	if ( n == NB_COLONNE * NB_LIGNE )
-		return MATCHNUL;
-
-	return NON;
+	return ( n == NB_COLONNE * NB_LIGNE ) ? MATCHNUL : NON;
 }
 
 /*
@@ -259,11 +256,12 @@ FinDePartie testFin( Etat * etat ) {
  *
  * @return 0
  */
-int lancerJeu(){
+void lancerJeu(){
     Coup * coup;
 	FinDePartie fin;
 
 	// initialisation
+    srand(time(NULL));
 	Etat * etat = etat_initial();
 
 	// Choisir qui commence :
@@ -301,10 +299,9 @@ int lancerJeu(){
 		printf("\n Match nul !  \n");
 	else
 		printf( "\n** BRAVO, vous avez battu l'ordinateur. **\n");
-
-	return 0;
 }
 
 int main(void) {
-    return lancerJeu();
+    lancerJeu();
+    return 0;
 }

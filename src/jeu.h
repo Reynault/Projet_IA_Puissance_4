@@ -5,6 +5,7 @@
 #include <stdlib.h>
 #include <math.h>
 #include <time.h>
+#include <limits.h>
 
 /*
 	Header du script principal:
@@ -58,6 +59,6 @@ int jouerCoup( Etat * etat, Coup * coup );
 FinDePartie testFin( Etat * etat );
 void afficheJeu(Etat * etat);
 Etat * etat_initial( void );
-int lancerJeu();
+void lancerJeu();
 
 #endif

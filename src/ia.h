@@ -6,6 +6,8 @@
     pour le script concernant l'ia
 */
 
+#define C sqrt(2)
+
 // Definition du type Noeud
 typedef struct NoeudSt {
 
@@ -21,13 +23,20 @@ typedef struct NoeudSt {
 	// POUR MCTS:
 	int nb_victoires;
 	int nb_simus;
+    
+    int estParcouru; // booléen permettant d'indiquer si le noeud a déjà été parcouru ou non (0 = non, 1 = oui)
 
 } Noeud;
 
 // Définition des méthodes
 void freeNoeud ( Noeud * noeud);
+void ordijoue_mcts(Etat * etat, int tempsmax);
+Noeud * effectuerMarcheAleatoire(Noeud * noeud);
 Noeud * ajouterEnfant(Noeud * parent, Coup * coup);
 Noeud * nouveauNoeud (Noeud * parent, Coup * coup );
-void ordijoue_mcts(Etat * etat, int tempsmax);
+Noeud * getNoeudPrioritaire(Noeud * noeud);
+Coup * getMeilleurCoup(Noeud * noeud);
+float getBValeur(Noeud * noeud);
+int creationFils(Noeud * noeud);
 
 #endif
