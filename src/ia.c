@@ -91,18 +91,22 @@ void ordijoue_mcts(Etat * etat, int tempsmax) {
             creationFils(courant);
             // récupération du fils prioritaire pour le noeud courant
             printf("creation fils\n");
-            fils = getNoeudPrioritaire(courant);
-            printf("noeud prioritaire\n");
-            // si celui-ci n'a pas encore été parcouru
-            if(!fils->estParcouru){
-                printf("noeud non parcouru\n");
-                // marche aléatoire
-                courant = effectuerMarcheAleatoire(courant);
-                printf("Fin de la marche aleatoire\n");
-            }else{
-                printf("noeud deja parcouru\n");
-                // sinon, le fils devient le noeud courant
-                courant = fils;
+            // si le noeud courant peut encore mener à des nouvelles configurations (coups possibles > 0)
+            if(courant->nb_enfants > 0) {
+                fils = getNoeudPrioritaire(courant);
+                printf("noeud prioritaire\n");
+                // si celui-ci n'a pas encore été parcouru
+                if (!fils->estParcouru) {
+                    printf("noeud non parcouru\n");
+                    // marche aléatoire à partir de l'un des enfants du noeud courant
+                    courant = effectuerMarcheAleatoire(
+                            courant->enfants[rand() % courant->nb_enfants]);
+                    printf("Fin de la marche aleatoire\n");
+                } else {
+                    printf("noeud deja parcouru\n");
+                    // sinon, le fils devient le noeud courant
+                    courant = fils;
+                }
             }
         }while(testFin(courant->etat) == NON);
         
@@ -148,7 +152,7 @@ int creationFils(Noeud * noeud){
  * Sachant que si un noeud parmis les fils n'a pas été explorés, on récupère
  * un tableau dans lequel on en prend un aléatoirement
  * 
- * @param noeud, le noeud duquel on veut récupérer le fils prioritaire
+ * @param noeud, le noeud duquel on veut récupérer le fils prioritaire (noeud qui possède des enfants)
  * @return le noeud le plus prioritaire
  */
 Noeud * getNoeudPrioritaire(Noeud * noeud){
@@ -240,12 +244,12 @@ Coup * getMeilleurCoup(Noeud * noeud){
  * puis en prendre un aléatoirement, tout en mettant à jour les noeuds jusqu'à arriver
  * à l'état tel qu'on est à la fin du jeu.
  * 
- * @param noeud, à partir duquel on réalise la marche aléatoire
+ * @param noeud, à partir duquel on réalise la marche aléatoire (dont les enfants n'ont pas encore été créés)
  * @return le noeud de la fin de la marche aléatoire
  */
 Noeud * effectuerMarcheAleatoire(Noeud * noeud){
     int iteration = 0; // nombre d'itération utilisé pour faire le chemin arrière
-    Noeud * courant = noeud->enfants[rand()%noeud->nb_enfants];
+    Noeud * courant = noeud;
     Noeud * tmp;
     Noeud * fin;
     FinDePartie estFini;
@@ -272,7 +276,7 @@ Noeud * effectuerMarcheAleatoire(Noeud * noeud){
     printf("assignation des valeurs de fin de partie\n");
 
     // libération des noeuds
-    while (iteration >= 0){
+    while (iteration > 0){
         printf("liberation d'un noeud\n");
         tmp = courant->parent;
         freeNoeud(courant);
