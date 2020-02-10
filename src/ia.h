@@ -38,7 +38,7 @@ Noeud * ajouterEnfant(Noeud * parent, Coup * coup);
 Noeud * nouveauNoeud (Noeud * parent, Coup * coup );
 Noeud * getNoeudPrioritaire(Noeud * noeud);
 Coup * getMeilleurCoup(Noeud * noeud);
-float getBValeur(Noeud * noeud);
+double getBValeur(Noeud * noeud);
 int creationFils(Noeud * noeud);
 
 #endif

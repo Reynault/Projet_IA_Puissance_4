@@ -36,9 +36,32 @@ Noeud * nouveauNoeud (Noeud * parent, Coup * coup ) {
  */
 Noeud * ajouterEnfant(Noeud * parent, Coup * coup) {
 	Noeud * enfant = nouveauNoeud (parent, coup ) ;
+	printf("oui, %d\n", parent->nb_enfants);
 	parent->enfants[parent->nb_enfants] = enfant;
+	printf("ici\n");
 	parent->nb_enfants++;
 	return enfant;
+}
+
+/*
+ * Fonction qui créer les fils d'un noeud
+ *
+ * @param noeud, dont il faut créer les fils, il faut que le noeud n'ait pas de fils
+ */
+int creationFils(Noeud * noeud){
+    Coup ** coups;
+    coups = coups_possibles(noeud->etat);
+    printf("creation des coups possibles\n");
+    // Parcours de tous les coups possibles et ajout de chaque
+    int k = 0;
+    while ( coups[k] != NULL) {
+        ajouterEnfant(noeud, coups[k]);
+        k++;
+    }
+    printf("fin de la creation des coups possibles, %d\n", k);
+    // Libération coups (tableau alloué qui contient les coups possibles)
+    free(coups);
+    printf("liberation des coups\n");
 }
 
 /*
@@ -91,8 +114,11 @@ void ordijoue_mcts(Etat * etat, int tempsmax) {
             marcheEffectuee = 0;
             // le noeud courant est alors parcouru
             courant->estParcouru = 1;
-            // création des fils
-            creationFils(courant);
+            printf("changement de valeur pour noeud courant\n");
+            // création des fils si le noeud n'a pas déjà été parcouru
+            if(!courant->estParcouru) {
+                creationFils(courant);
+            }
             // récupération du fils prioritaire pour le noeud courant
             printf("creation fils\n");
             // si le noeud courant peut encore mener à des nouvelles configurations (coups possibles > 0)
@@ -130,26 +156,6 @@ void ordijoue_mcts(Etat * etat, int tempsmax) {
 }
 
 /*
- * Fonction qui créer les fils d'un noeud
- * 
- * @param noeud, dont il faut créer les fils
- */
-int creationFils(Noeud * noeud){
-	Coup ** coups;
-    coups = coups_possibles(noeud->etat);
-    
-    // Parcours de tous les coups possibles et ajout de chaque
-    int k = 0;
-    while ( coups[k] != NULL) {
-        ajouterEnfant(noeud, coups[k]);
-        k++;
-    }
-
-    // Libération coups (tableau alloué qui contient les coups possibles)
-    free(coups);
-}
-
-/*
  * Fonction qui permet de récupérer le noeud
  * prioritaire parmis les fils du noeud passé en paramètre.
  * 
@@ -166,7 +172,7 @@ Noeud * getNoeudPrioritaire(Noeud * noeud){
     
     int indices_pas_parcourus[nb_enfants];  // indices des noeuds pas déjà parcourus dans enfants
     int nb_pas_parcourus = 0;
-    float b_valeur_courante, max = LONG_MIN;
+    double b_valeur_courante, max = LONG_MIN;
 
     printf("debut noeud prioritaire\n");
     // vérification de la présence de noeuds non parcourus
@@ -253,10 +259,10 @@ Noeud * effectuerMarcheAleatoire(Noeud * noeud){
     Etat * etatCourant;
     Coup ** coups;
     FinDePartie estFini;
-    int nbCoups, taille = sizeof(noeud->etat);
+    int nbCoups;
     
     // copie du bloc mémoire contenant l'état du noeud
-    etatCourant = (noeud->etat);
+    etatCourant = copieEtat(noeud->etat);
 
     // tant qu'on arrive pas à la fin
     printf("debut de la marche aleatoire\n");
@@ -294,14 +300,14 @@ Noeud * effectuerMarcheAleatoire(Noeud * noeud){
  * @param noeud, noeud fourni
  * @return la B-valeur
  */
-float getBValeur(Noeud * noeud){
-    int moyenne_recompense, exploration;
-    int b_valeur = 0;
+double getBValeur(Noeud * noeud){
+    double moyenne_recompense, exploration;
+    double b_valeur = 0;
     
     // si le noeud a déjà été parcouru et qu'il n'est pas la racine
     if(noeud->estParcouru && noeud->parent != NULL){
         // calcul de la moyenne de la récompense (nb_victoires / nb_simus) (exploitation)
-        moyenne_recompense = noeud->nb_victoires / noeud->nb_simus;
+        moyenne_recompense = (double)noeud->nb_victoires / (double)noeud->nb_simus;
         
         // calcul de l'exploration
         exploration = sqrt(log(noeud->parent->nb_simus)/noeud->nb_simus);

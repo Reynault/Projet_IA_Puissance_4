@@ -261,7 +261,7 @@ void lancerJeu(){
 	FinDePartie fin;
 
 	// initialisation
-    srand(time(NULL));
+    srand(time(0));
 	Etat * etat = etat_initial();
 
 	// Choisir qui commence :
