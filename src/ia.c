@@ -87,6 +87,7 @@ void ordijoue_mcts(Etat * etat, int tempsmax) {
         // tant qu'on arrive pas à la fin de l'arbre, 
         // ou qu'on ne fait pas de marche aléatoire
         do{
+            printf("debut du parcours de l'arbre\n");
             marcheEffectuee = 0;
             // le noeud courant est alors parcouru
             courant->estParcouru = 1;
@@ -255,8 +256,7 @@ Noeud * effectuerMarcheAleatoire(Noeud * noeud){
     int nbCoups, taille = sizeof(noeud->etat);
     
     // copie du bloc mémoire contenant l'état du noeud
-    etatCourant = (Etat *) malloc( taille );
-    memcpy(etatCourant, noeud->etat, taille);
+    etatCourant = (noeud->etat);
 
     // tant qu'on arrive pas à la fin
     printf("debut de la marche aleatoire\n");
@@ -283,9 +283,6 @@ Noeud * effectuerMarcheAleatoire(Noeud * noeud){
     
     // libération de l'état
     free(etatCourant);
-    if(noeud == NULL){
-        printf("oui");
-    }
 }
 
 /*
