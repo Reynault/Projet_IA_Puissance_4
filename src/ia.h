@@ -6,6 +6,8 @@
     pour le script concernant l'ia
 */
 
+#include <math.h>
+#include <string.h>
 #define C sqrt(2)
 
 // Definition du type Noeud

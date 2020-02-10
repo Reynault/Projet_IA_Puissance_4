@@ -78,13 +78,16 @@ void ordijoue_mcts(Etat * etat, int tempsmax) {
     Noeud * courant;
     Noeud * fils;
 	int iter = 0;
+    int marcheEffectuee;
 
 	do {
         // on part du noeud racine
         courant = racine;
         
-        // tant qu'on arrive pas à la fin de l'arbre
+        // tant qu'on arrive pas à la fin de l'arbre, 
+        // ou qu'on ne fait pas de marche aléatoire
         do{
+            marcheEffectuee = 0;
             // le noeud courant est alors parcouru
             courant->estParcouru = 1;
             // création des fils
@@ -99,16 +102,16 @@ void ordijoue_mcts(Etat * etat, int tempsmax) {
                 if (!fils->estParcouru) {
                     printf("noeud non parcouru\n");
                     // marche aléatoire à partir de l'un des enfants du noeud courant
-                    courant = effectuerMarcheAleatoire(
+                    effectuerMarcheAleatoire(
                             courant->enfants[rand() % courant->nb_enfants]);
-                    printf("Fin de la marche aleatoire\n");
+                    marcheEffectuee = 1;
                 } else {
                     printf("noeud deja parcouru\n");
                     // sinon, le fils devient le noeud courant
                     courant = fils;
                 }
             }
-        }while(testFin(courant->etat) == NON);
+        }while(testFin(courant->etat) != NON || !marcheEffectuee);
         
         // récupération du temps pour vérification
 		toc = clock();
@@ -240,53 +243,49 @@ Coup * getMeilleurCoup(Noeud * noeud){
 
 /*
  * Fonction qui permet d'effectuer la marche aléatoire, elle va parcourir aléatoirement
- * l'arbre en partant d'un noeud. Elle va alors, générer les fils pour chaque noeud
- * puis en prendre un aléatoirement, tout en mettant à jour les noeuds jusqu'à arriver
- * à l'état tel qu'on est à la fin du jeu.
+ * l'arbre en partant d'un noeud. On copie l'état actuel dans un autre état qui va nous servir
+ * à parcourir l'arbre sans générer les fils. (juste un état à modifier)
  * 
- * @param noeud, à partir duquel on réalise la marche aléatoire (dont les enfants n'ont pas encore été créés)
- * @return le noeud de la fin de la marche aléatoire
+ * @param noeud, à partir duquel on réalise la marche aléatoire
  */
 Noeud * effectuerMarcheAleatoire(Noeud * noeud){
-    int iteration = 0; // nombre d'itération utilisé pour faire le chemin arrière
-    Noeud * courant = noeud;
-    Noeud * tmp;
-    Noeud * fin;
+    Etat * etatCourant;
+    Coup ** coups;
     FinDePartie estFini;
+    int nbCoups, taille = sizeof(noeud->etat);
+    
+    // copie du bloc mémoire contenant l'état du noeud
+    etatCourant = (Etat *) malloc( taille );
+    memcpy(etatCourant, noeud->etat, taille);
 
     // tant qu'on arrive pas à la fin
-    printf("debut de la marche aléatoire\n");
-    while((estFini = testFin(courant->etat)) == NON){
-        // génération des noeuds enfants
-        printf("creation des fils\n");
-        creationFils(courant);
-        // choix d'un noeud aléatoire
-        printf("choix d'un fils\n");
-        courant = courant->enfants[rand()%courant->nb_enfants];
-        iteration ++;
+    printf("debut de la marche aleatoire\n");
+    while((estFini = testFin(etatCourant)) == NON){
+        // récupération d'un mouvement aléatoire parmi les coups possibles
+        coups = coups_possibles(etatCourant);
+        nbCoups = 0;
+        while ( coups[nbCoups] != NULL) {
+            nbCoups++;
+        }
+        // modification du noeud courant
+        jouerCoup(etatCourant, coups[rand()%nbCoups]);
+        // libération de la liste des coups
+        free(coups);
     }
     printf("fin de la marche aleatoire\n");
 
     // Calcul de la récompense
     if (estFini == ORDI_GAGNE) {
-        noeud->nb_victoires += 1;
+        noeud->nb_victoires += 1;   // et mise à jour du noeud en param
     }
     noeud->nb_simus++;
-    fin = courant;
     printf("assignation des valeurs de fin de partie\n");
-
-    // libération des noeuds
-    while (iteration > 0){
-        printf("liberation d'un noeud\n");
-        tmp = courant->parent;
-        freeNoeud(courant);
-        courant = tmp;
-        iteration--;
+    
+    // libération de l'état
+    free(etatCourant);
+    if(noeud == NULL){
+        printf("oui");
     }
-
-    printf("fin des liberations\n");
-    printf("nombre enfant noeud courant : %d\n", fin->nb_enfants);
-    return fin;
 }
 
 /*

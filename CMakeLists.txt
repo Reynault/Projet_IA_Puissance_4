@@ -13,3 +13,5 @@ file(GLOB SOURCES
 add_executable(Projet_IA_Puissance_4
         src/jeu.c
         src/ia.c)
+
+target_link_libraries(Projet_IA_Puissance_4 m)
