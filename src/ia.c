@@ -47,6 +47,7 @@ Noeud * ajouterEnfant(Noeud * parent, Coup * coup) {
  * @param noeud, dont il faut créer les fils, il faut que le noeud n'ait pas de fils
  */
 int creationFils(Noeud * noeud){
+    printf("creation des fils\n");
     Coup ** coups;
     coups = coups_possibles(noeud->etat);
     // Parcours de tous les coups possibles et ajout de chaque
@@ -105,6 +106,7 @@ void ordijoue_mcts(Etat * etat, int tempsmax) {
         noeudNonExploree = 0;
         courant = racine;
 
+        printf("parcours de l'arbre\n");
         // parcours de l'arbre jusqu'à trouver un noeud non parcouru, ou à arriver à la fin
         do{
             // création des fils si le noeud n'a pas déjà été parcouru
@@ -117,6 +119,7 @@ void ordijoue_mcts(Etat * etat, int tempsmax) {
             // récupération du fils prioritaire pour le noeud courant
             // si le noeud courant peut encore mener à des nouvelles configurations (coups possibles > 0)
             if(courant->nb_enfants > 0) {
+                printf("recuperation du noeud prioritaire\n");
                 courant = getNoeudPrioritaire(courant);
 
                 // si celui-ci n'a pas encore été parcouru on sort de la boucle.
@@ -128,8 +131,10 @@ void ordijoue_mcts(Etat * etat, int tempsmax) {
         if(noeudNonExploree) resultat = effectuerMarcheAleatoire(courant);
 
         // calcul de la récompense
+        printf("calculer la recompense\n");
         courant->nb_victoires += calculerRecompense(resultat);
 
+        printf("remonter les valeurs vers la racine\n");
         // on remonte les valeurs vers la racine
         remonterValeurVersRacine(courant);
 
@@ -270,7 +275,8 @@ FinDePartie effectuerMarcheAleatoire(Noeud * noeud){
     Coup ** coups;
     FinDePartie estFini;
     int nbCoups;
-    
+
+    printf("effectuer marche aleatoire\n");
     // copie du bloc mémoire contenant l'état du noeud
     etatCourant = copieEtat(noeud->etat);
 

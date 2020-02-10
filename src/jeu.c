@@ -270,10 +270,10 @@ void lancerJeu(){
 
 	// boucle de jeu
 	do {
+        printf("\n");
+        afficheJeu(etat);
 		if ( etat->joueur == 0 ) {
 		    // tour de l'humain
-            printf("\n");
-            afficheJeu(etat);
 			do {
 				coup = demanderCoup();
 			} while ( !jouerCoup(etat, coup) );
