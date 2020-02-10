@@ -49,7 +49,7 @@ Etat * etat_initial( void ) {
 			etat->plateau[i][j] = VIDE;
 
 	/* remplissage du tableau qui indique les colonnes : */
-	for (i=0; i< NB_LIGNE; i++)
+	for (i=0; i< NB_COLONNE; i++)
         etat->nombre_pions[i] = 0;
 
 	return etat;
@@ -248,7 +248,7 @@ FinDePartie testFin( Etat * etat ) {
     }
 
 	// et sinon tester le match nul
-	return ( n == NB_COLONNE * NB_LIGNE ) ? MATCHNUL : NON;
+	return ( n == (NB_COLONNE * NB_LIGNE) ) ? MATCHNUL : NON;
 }
 
 /*
@@ -270,25 +270,19 @@ void lancerJeu(){
 
 	// boucle de jeu
 	do {
-
 		if ( etat->joueur == 0 ) {
-			// tour de l'humain
-
+		    // tour de l'humain
             printf("\n");
             afficheJeu(etat);
 			do {
 				coup = demanderCoup();
 			} while ( !jouerCoup(etat, coup) );
-
-		}
-		else {
-			// tour de l'Ordinateur
+		}else {
+		    // tour de l'Ordinateur
 			ordijoue_mcts( etat, TEMPS );
-
 		}
-
 		fin = testFin( etat );
-	}	while ( fin == NON ) ;
+	} while ( fin == NON ) ;
 
 	printf("\n");
 	afficheJeu(etat);
