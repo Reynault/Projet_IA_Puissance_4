@@ -170,7 +170,7 @@ void remonterValeurVersRacine(Noeud * noeud, FinDePartie resultat){
     while(courant->parent != NULL){
         if(resultat == ORDI_GAGNE && noeud->joueur == JOUEUR_ORDI && courant->nb_victoires < noeud->nb_victoires){
             courant->nb_victoires = noeud->nb_victoires;
-        } else if (resultat == HUMAIN_GAGNE && noeud->joueur == JOUEUR_HUMAIN){
+        } else if (resultat == HUMAIN_GAGNE && noeud->joueur == JOUEUR_HUMAIN && courant->nb_victoires < noeud->nb_victoires){
             courant->nb_victoires = noeud->nb_victoires;
         }
         courant = courant->parent;
