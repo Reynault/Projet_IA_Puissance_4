@@ -122,10 +122,8 @@ void ordijoue_mcts(Etat * etat, int tempsmax) {
                 // si celui-ci n'a pas encore été parcouru on sort de la boucle.
                 if (courant->estParcouru == 0)  noeudNonExploree = 1;
             }
-            printf("oui ?");
         }while( (resultat = testFin(courant->etat)) == NON && noeudNonExploree == 0);
 
-        printf("ici ?");
         // si on s'arrête à cause d'un noeud non exploré
         if(noeudNonExploree == 1){
             // lancement d'une marche aléatoire
@@ -159,7 +157,7 @@ void ordijoue_mcts(Etat * etat, int tempsmax) {
  */
 void remonterValeurVersRacine(Noeud * noeud, FinDePartie resultat){
     Noeud * courant = noeud;
-    while(courant->parent != NULL){
+    while(courant != NULL){
         courant->nb_simus++;
         if(resultat == ORDI_GAGNE){
             courant->nb_victoires++;
