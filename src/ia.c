@@ -123,7 +123,6 @@ void ordijoue_mcts(Etat * etat, int tempsmax) {
 
             // le noeud courant est alors parcouru
             courant->estParcouru = 1;
-            courant->nb_simus++;
 
             // récupération du fils prioritaire pour le noeud courant
             // si le noeud courant peut encore mener à des nouvelles configurations (coups possibles > 0)
@@ -139,12 +138,8 @@ void ordijoue_mcts(Etat * etat, int tempsmax) {
         // si on s'arrête à cause d'un noeud non exploré, lancement d'une marche aléatoire
         if(noeudNonExploree) resultat = effectuerMarcheAleatoire(courant);
 
-        // calcul de la récompense
-        printf("calculer la recompense\n");
-        calculerRecompense(courant, resultat);
-
         printf("remonter les valeurs vers la racine\n");
-        // on remonte les valeurs vers la racine
+        // on remonte les valeurs vers la racine en mettant à jour les noeuds
         remonterValeurVersRacine(courant, resultat);
 
         // récupération du temps pour vérification
@@ -168,27 +163,11 @@ void ordijoue_mcts(Etat * etat, int tempsmax) {
 void remonterValeurVersRacine(Noeud * noeud, FinDePartie resultat){
     Noeud * courant = noeud;
     while(courant->parent != NULL){
-        if(resultat == ORDI_GAGNE && noeud->joueur == JOUEUR_ORDI && courant->nb_victoires < noeud->nb_victoires){
-            courant->nb_victoires = noeud->nb_victoires;
-        } else if (resultat == HUMAIN_GAGNE && noeud->joueur == JOUEUR_HUMAIN && courant->nb_victoires < noeud->nb_victoires){
-            courant->nb_victoires = noeud->nb_victoires;
+        courant->nb_simus++;
+        if(resultat == ORDI_GAGNE){
+            courant->nb_victoires++;
         }
         courant = courant->parent;
-    }
-}
-
-/*
- * Fonction qui permet de calculer la récompense obtenu
- * @param resultat, indice de fin de partie
- * @return un entier correspondant à la récompense
- */
-void calculerRecompense(Noeud* courant, FinDePartie resultat){
-    if(courant != NULL) {
-        if (resultat == ORDI_GAGNE && courant->joueur == JOUEUR_ORDI){
-            courant->nb_victoires ++;
-        }else if(resultat == HUMAIN_GAGNE && courant->joueur == JOUEUR_HUMAIN){
-            courant->nb_victoires ++;
-        }
     }
 }
 
