@@ -271,22 +271,21 @@ void lancerJeu(){
 
 	// boucle de jeu
 	do {
-        printf("\n");
-        afficheJeu(etat);
 		if ( etat->joueur == JOUEUR_HUMAIN ) {
 		    // tour de l'humain
+            printf("\n");
+            afficheJeu(etat);
 			do {
 				coup = demanderCoup();
 			} while ( !jouerCoup(etat, coup) );
+            printf("\n");
+            afficheJeu(etat);
 		}else {
 		    // tour de l'Ordinateur
 			ordijoue_mcts( etat, TEMPS );
 		}
 		fin = testFin( etat );
 	} while ( fin == NON ) ;
-
-	printf("\n");
-	afficheJeu(etat);
 
 	if ( fin == ORDI_GAGNE )
 		printf( "\n** Victoire de l'ordinateur, vous avez perdu ! **\n");
