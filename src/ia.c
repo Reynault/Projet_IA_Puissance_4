@@ -13,8 +13,7 @@ Noeud * nouveauNoeud (Noeud * parent, Coup * coup ) {
 		jouerCoup ( noeud->etat, coup );
 		noeud->coup = coup;
 		noeud->joueur = AUTRE_JOUEUR(parent->joueur);
-	}
-	else {
+	} else {
 		noeud->etat = NULL;
 		noeud->coup = NULL;
 		noeud->joueur = 0;
@@ -56,6 +55,7 @@ int creationFils(Noeud * noeud){
         ajouterEnfant(noeud, coups[k]);
         k++;
     }
+    printf("fin de la creation des fils\n");
     // Libération coups (tableau alloué qui contient les coups possibles)
     free(coups);
 }
@@ -99,18 +99,27 @@ void ordijoue_mcts(Etat * etat, int tempsmax) {
     // implémentation de l'algorithme MCTS-UCT pour 
     // déterminer le meilleur coup ci-dessous
 	int iter = 0;
-    int noeudNonExploree;
+    int finDeArbre, noeudNonExploree;
 
 	do {
         // initiatlisation des valeurs de base
         noeudNonExploree = 0;
+        finDeArbre = 0;
         courant = racine;
 
         printf("parcours de l'arbre\n");
-        // parcours de l'arbre jusqu'à trouver un noeud non parcouru, ou à arriver à la fin
+        // parcours de l'arbre jusqu'à trouver un noeud non parcouru, ou à arriver à la fin du jeu, ou arriver
+        // à la fin de l'arbre
         do{
+            printf("parcours d'un noeud\n");
             // création des fils si le noeud n'a pas déjà été parcouru
-            if(!courant->estParcouru) creationFils(courant);
+            if(!courant->estParcouru){
+                creationFils(courant);
+            }else if(courant->nb_enfants == 0){
+                // si le noeud courant a déjà été exploré, et qu'il n'y a pas d'enfants
+                // on se trouve à la fin de l'arbre
+                finDeArbre = 1;
+            };
 
             // le noeud courant est alors parcouru
             courant->estParcouru = 1;
@@ -125,18 +134,18 @@ void ordijoue_mcts(Etat * etat, int tempsmax) {
                 // si celui-ci n'a pas encore été parcouru on sort de la boucle.
                 if (!courant->estParcouru)  noeudNonExploree = 1;
             }
-        }while((resultat = testFin(courant->etat)) != NON || !noeudNonExploree);
+        }while( (resultat = testFin(courant->etat)) != NON && !noeudNonExploree && !finDeArbre);
 
         // si on s'arrête à cause d'un noeud non exploré, lancement d'une marche aléatoire
         if(noeudNonExploree) resultat = effectuerMarcheAleatoire(courant);
 
         // calcul de la récompense
         printf("calculer la recompense\n");
-        courant->nb_victoires += calculerRecompense(resultat);
+        calculerRecompense(courant, resultat);
 
         printf("remonter les valeurs vers la racine\n");
         // on remonte les valeurs vers la racine
-        remonterValeurVersRacine(courant);
+        remonterValeurVersRacine(courant, resultat);
 
         // récupération du temps pour vérification
 		toc = clock();
@@ -156,10 +165,15 @@ void ordijoue_mcts(Etat * etat, int tempsmax) {
  * en partant d'un noeud
  * @param noeud à partir duquel on remonte les valeurs
  */
-void remonterValeurVersRacine(Noeud * noeud){
-    while(noeud->parent != NULL){
-        if(noeud->parent->nb_victoires < noeud->nb_victoires) noeud->parent->nb_victoires = noeud->nb_victoires;
-        noeud = noeud->parent;
+void remonterValeurVersRacine(Noeud * noeud, FinDePartie resultat){
+    Noeud * courant = noeud;
+    while(courant->parent != NULL){
+        if(resultat == ORDI_GAGNE && noeud->joueur == JOUEUR_ORDI && courant->nb_victoires < noeud->nb_victoires){
+            courant->nb_victoires = noeud->nb_victoires;
+        } else if (resultat == HUMAIN_GAGNE && noeud->joueur == JOUEUR_HUMAIN){
+            courant->nb_victoires = noeud->nb_victoires;
+        }
+        courant = courant->parent;
     }
 }
 
@@ -168,10 +182,14 @@ void remonterValeurVersRacine(Noeud * noeud){
  * @param resultat, indice de fin de partie
  * @return un entier correspondant à la récompense
  */
-int calculerRecompense(FinDePartie resultat){
-    int recompense = 0;
-    if(resultat == ORDI_GAGNE) recompense = 1;
-    return recompense;
+void calculerRecompense(Noeud* courant, FinDePartie resultat){
+    if(courant != NULL) {
+        if (resultat == ORDI_GAGNE && courant->joueur == JOUEUR_ORDI){
+            courant->nb_victoires ++;
+        }else if(resultat == HUMAIN_GAGNE && courant->joueur == JOUEUR_HUMAIN){
+            courant->nb_victoires ++;
+        }
+    }
 }
 
 /*
@@ -185,7 +203,7 @@ int calculerRecompense(FinDePartie resultat){
  * @return le noeud le plus prioritaire
  */
 Noeud * getNoeudPrioritaire(Noeud * noeud){
-    Noeud * prioritaire;
+    Noeud * prioritaire = noeud;
     Noeud ** enfants = noeud->enfants;
     int nb_enfants = noeud->nb_enfants;
     
@@ -202,7 +220,9 @@ Noeud * getNoeudPrioritaire(Noeud * noeud){
             nb_pas_parcourus ++;
         }else{
             // sinon, mise à jour de max
+            printf("Mise à jour du prioritaire: ");
             b_valeur_courante = getBValeur(enfants[i]);
+            printf("b-valeur: %f", b_valeur_courante);
             if(b_valeur_courante > max){
                 prioritaire = enfants[i];
                 max = b_valeur_courante;
@@ -233,9 +253,9 @@ Noeud * getNoeudPrioritaire(Noeud * noeud){
  * @return le meilleur coup
  */
 Coup * getMeilleurCoup(Noeud * noeud){
-    int max, valeurCourante;
+    float valeurCourante, max = INT_MIN;
     int nb_enfants = noeud->nb_enfants;
-    Coup * meilleurCoup;
+    Coup * meilleurCoup = NULL;
     Noeud * enfant;
     
     // récupération du meilleur coup parmis les enfants du noeud fourni
@@ -243,7 +263,7 @@ Coup * getMeilleurCoup(Noeud * noeud){
         enfant = noeud->enfants[i];
         // les coups possibles sont ceux d'un enfant qui a été parcouru
         if(enfant->estParcouru){
-            valeurCourante = enfant->nb_victoires/enfant->nb_simus;
+            valeurCourante = (float)(enfant->nb_victoires) / (float)(enfant->nb_simus);
             if(valeurCourante > max){
                 max = valeurCourante;
                 meilleurCoup = noeud->coup;
@@ -253,11 +273,7 @@ Coup * getMeilleurCoup(Noeud * noeud){
     
     // si le meilleur coup n'a pas été trouvé, cela signifie qu'il n'y a pas
     // de fils qui a été exploré, on prend alors un coup aléatoire
-    if(meilleurCoup == NULL){
-        meilleurCoup = noeud->enfants[
-            rand()%nb_enfants
-        ]->coup;
-    }
+    if(meilleurCoup == NULL) meilleurCoup = noeud->enfants[rand()%nb_enfants]->coup;
     
     return meilleurCoup;
 }
@@ -310,9 +326,8 @@ FinDePartie effectuerMarcheAleatoire(Noeud * noeud){
  * @return la B-valeur
  */
 double getBValeur(Noeud * noeud){
-    double moyenne_recompense, exploration;
-    double b_valeur = 0;
-    
+    double moyenne_recompense, exploration, b_valeur = 0;
+
     // si le noeud a déjà été parcouru et qu'il n'est pas la racine
     if(noeud->estParcouru && noeud->parent != NULL){
         // calcul de la moyenne de la récompense (nb_victoires / nb_simus) (exploitation)
@@ -325,7 +340,7 @@ double getBValeur(Noeud * noeud){
         b_valeur = moyenne_recompense + C * exploration;
         
         // inversion du signe en fonction du joueur
-        if(noeud->joueur == 0){
+        if(noeud->joueur == JOUEUR_HUMAIN){
             b_valeur = -b_valeur;
         }
     }

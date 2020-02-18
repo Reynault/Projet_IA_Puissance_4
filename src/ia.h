@@ -33,8 +33,8 @@ typedef struct NoeudSt {
 // Définition des méthodes
 void freeNoeud ( Noeud * noeud);
 void ordijoue_mcts(Etat * etat, int tempsmax);
-void remonterValeurVersRacine(Noeud * noeud);
-int calculerRecompense(FinDePartie resultat);
+void remonterValeurVersRacine(Noeud * noeud, FinDePartie resultat);
+void calculerRecompense(Noeud* courant, FinDePartie resultat);
 FinDePartie effectuerMarcheAleatoire(Noeud * noeud);
 Noeud * ajouterEnfant(Noeud * parent, Coup * coup);
 Noeud * nouveauNoeud (Noeud * parent, Coup * coup );

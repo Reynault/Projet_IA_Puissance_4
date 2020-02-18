@@ -148,6 +148,7 @@ int jouerCoup( Etat * etat, Coup * coup ) {
 */
 Coup ** coups_possibles( Etat * etat ) {
 
+    printf("creation des coups possibles\n");
 	Coup ** coups = (Coup **) malloc((1+LARGEUR_MAX) * sizeof(Coup *) );
 
     // index qui permet de parcourir le tableau de pointeurs
@@ -163,7 +164,7 @@ Coup ** coups_possibles( Etat * etat ) {
         }
     }
 
-
+    printf("fin de la creation des coups possibles\n");
 
 	coups[k] = NULL;
 	return coups;
@@ -272,7 +273,7 @@ void lancerJeu(){
 	do {
         printf("\n");
         afficheJeu(etat);
-		if ( etat->joueur == 0 ) {
+		if ( etat->joueur == JOUEUR_HUMAIN ) {
 		    // tour de l'humain
 			do {
 				coup = demanderCoup();

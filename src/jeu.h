@@ -31,6 +31,8 @@
 
 // macros
 #define AUTRE_JOUEUR(i) (1-(i))
+#define JOUEUR_HUMAIN   0
+#define JOUEUR_ORDI     1
 #define min(a, b)       ((a) < (b) ? (a) : (b))
 #define max(a, b)       ((a) < (b) ? (b) : (a))
 
