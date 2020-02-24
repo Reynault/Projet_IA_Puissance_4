@@ -96,7 +96,7 @@ void ordijoue_mcts(Etat * etat, int tempsmax) {
 
     // implémentation de l'algorithme MCTS-UCT pour 
     // déterminer le meilleur coup ci-dessous
-	int iter = 0;
+	int iteration = 0;
     int noeudNonExploree;
 
 	do {
@@ -135,19 +135,29 @@ void ordijoue_mcts(Etat * etat, int tempsmax) {
         // on remonte les valeurs vers la racine en mettant à jour les noeuds
         if(resultat != NON) {
             remonterValeurVersRacine(courant, resultat);
+            if(resultat == ORDI_GAGNE) printf("resultat == ORDI_GAGNE\n");
+            if(resultat == MATCHNUL) printf("resultat == MATCHNUL\n");
+            if(resultat == HUMAIN_GAGNE) printf("resultat == HUMAIN_GAGNE\n");
         }
 
         // récupération du temps pour vérification
 		toc = clock();
 		temps = (int)( ((double) (toc - tic)) / CLOCKS_PER_SEC );
-		iter ++;
+		iteration ++;
 	} while ( temps < tempsmax );
 
 	// Jouer le meilleur premier coup
-	jouerCoup(etat, getMeilleurCoup(racine));
+    Noeud * meilleurNoeud = getMeilleurNoeud(racine);
+	jouerCoup(etat, meilleurNoeud->coup);
+
+    // affichage des informations concernant le nombre de simulations
+    printf("\nNombre de simulations : %d\n", iteration);
+    // et l'estimation de la probabilité de victoire
+    printf("Estimation de la probabilite de victoire pour l'ordinateur : %f\n", (float)(meilleurNoeud->nb_victoires) / (float)(meilleurNoeud->nb_simus));
 
 	// Penser à libérer la mémoire :
 	freeNoeud(racine);
+	freeNoeud(meilleurNoeud);
 }
 
 /*
@@ -194,7 +204,6 @@ Noeud * getNoeudPrioritaire(Noeud * noeud){
             nb_pas_parcourus ++;
         }else{
             // sinon, mise à jour de max
-            printf("Mise a jour du jeu max\n");
             b_valeur_courante = getBValeur(enfants[i]);
             if(b_valeur_courante > max){
                 prioritaire = enfants[i];
@@ -225,10 +234,10 @@ Noeud * getNoeudPrioritaire(Noeud * noeud){
  * @param noeud, noeud à partir duquel on cherche le meilleur coup (parmis ceux de ses fils)
  * @return le meilleur coup
  */
-Coup * getMeilleurCoup(Noeud * noeud){
+Noeud * getMeilleurNoeud(Noeud * noeud){
     float valeurCourante, max = INT_MIN;
     int nb_enfants = noeud->nb_enfants;
-    Coup * meilleurCoup = NULL;
+    Noeud * meilleurNoeud = NULL;
     Noeud * enfant;
     
     // récupération du meilleur coup parmis les enfants du noeud fourni
@@ -239,19 +248,18 @@ Coup * getMeilleurCoup(Noeud * noeud){
             valeurCourante = (float)(enfant->nb_victoires) / (float)(enfant->nb_simus);
             if(valeurCourante > max){
                 max = valeurCourante;
-                meilleurCoup = enfant->coup;
+                meilleurNoeud = enfant;
             }
         }
     }
     
     // si le meilleur coup n'a pas été trouvé, cela signifie qu'il n'y a pas
     // de fils qui a été exploré, on prend alors un coup aléatoire
-    if(meilleurCoup == NULL){
-        meilleurCoup = noeud->enfants[rand()%nb_enfants]->coup;
-        printf("meilleur coup aleatoire\n");
+    if(meilleurNoeud == NULL){
+        meilleurNoeud = noeud->enfants[rand()%nb_enfants];
     }
     
-    return meilleurCoup;
+    return meilleurNoeud;
 }
 
 /*
@@ -310,14 +318,14 @@ double getBValeur(Noeud * noeud){
         
         // calcul de l'exploration
         exploration = sqrt(log(noeud->parent->nb_simus)/noeud->nb_simus);
-        
-        // calcul de la b_valeur en utilisant la constante C
-        b_valeur = moyenne_recompense + C * exploration;
 
         // inversion du signe en fonction du joueur
         if(noeud->joueur == JOUEUR_HUMAIN){
-            b_valeur = -b_valeur;
+            moyenne_recompense = -moyenne_recompense;
         }
+
+        // calcul de la b_valeur en utilisant la constante C
+        b_valeur = moyenne_recompense + C * exploration;
     }
     
     return b_valeur;

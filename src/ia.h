@@ -38,7 +38,7 @@ FinDePartie effectuerMarcheAleatoire(Noeud * noeud);
 Noeud * ajouterEnfant(Noeud * parent, Coup * coup);
 Noeud * nouveauNoeud (Noeud * parent, Coup * coup );
 Noeud * getNoeudPrioritaire(Noeud * noeud);
-Coup * getMeilleurCoup(Noeud * noeud);
+Noeud * getMeilleurNoeud(Noeud * noeud);
 double getBValeur(Noeud * noeud);
 int creationFils(Noeud * noeud);
 
