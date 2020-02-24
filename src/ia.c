@@ -99,7 +99,9 @@ void ordijoue_mcts(Etat * etat, int tempsmax) {
 	int iteration = 0;
     int noeudNonExploree;
 
+    printf("parcours arbre\n");
 	do {
+        printf("parcours noeud\n");
         // initiatlisation des valeurs de base
         noeudNonExploree = 0;
         courant = racine;
@@ -107,6 +109,7 @@ void ordijoue_mcts(Etat * etat, int tempsmax) {
         // parcours de l'arbre jusqu'à trouver un noeud non parcouru, ou à arriver à la fin du jeu, ou arriver
         // à la fin de l'arbre
         do{
+            printf("est parcouru\n");
             // création des fils si le noeud n'a pas déjà été parcouru
             if(courant->estParcouru == 0){
                 creationFils(courant);
@@ -117,27 +120,31 @@ void ordijoue_mcts(Etat * etat, int tempsmax) {
             // récupération du fils prioritaire pour le noeud courant
             // si le noeud courant peut encore mener à des nouvelles configurations (coups possibles > 0)
             if(courant->nb_enfants > 0) {
+                printf("enfant > 0 donc recup noeud prioritaire\n");
                 courant = getNoeudPrioritaire(courant);
 
                 // si celui-ci n'a pas encore été parcouru on sort de la boucle.
-                if (courant->estParcouru == 0)  noeudNonExploree = 1;
+                if (courant->estParcouru == 0) {
+                    printf("noeud non explore\n");
+                    noeudNonExploree = 1;
+                }
             }
         }while( (resultat = testFin(courant->etat)) == NON && noeudNonExploree == 0);
 
         // si on s'arrête à cause d'un noeud non exploré
         if(noeudNonExploree == 1){
             // lancement d'une marche aléatoire
+            printf("marche aleatoire\n");
             resultat = effectuerMarcheAleatoire(courant);
+            printf("creation fils\n");
             creationFils(courant);
             courant->estParcouru = 1; // et mise à jour du noeud exploré
         }
 
         // on remonte les valeurs vers la racine en mettant à jour les noeuds
         if(resultat != NON) {
+            printf("remonter valeurs\n");
             remonterValeurVersRacine(courant, resultat);
-            if(resultat == ORDI_GAGNE) printf("resultat == ORDI_GAGNE\n");
-            if(resultat == MATCHNUL) printf("resultat == MATCHNUL\n");
-            if(resultat == HUMAIN_GAGNE) printf("resultat == HUMAIN_GAGNE\n");
         }
 
         // récupération du temps pour vérification
@@ -147,6 +154,7 @@ void ordijoue_mcts(Etat * etat, int tempsmax) {
 	} while ( temps < tempsmax );
 
 	// Jouer le meilleur premier coup
+    printf("recup meilleur coup\n");
     Noeud * meilleurNoeud = getMeilleurNoeud(racine);
 	jouerCoup(etat, meilleurNoeud->coup);
 
