@@ -285,6 +285,7 @@ void lancerJeu(){
 		fin = testFin( etat );
 	} while ( fin == NON ) ;
 
+    afficheJeu(etat);
 	if ( fin == ORDI_GAGNE )
 		printf( "\n** Victoire de l'ordinateur, vous avez perdu ! **\n");
 	else if ( fin == MATCHNUL )

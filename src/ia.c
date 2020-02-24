@@ -165,7 +165,6 @@ void ordijoue_mcts(Etat * etat, int tempsmax) {
 
 	// Penser à libérer la mémoire :
 	freeNoeud(racine);
-	freeNoeud(meilleurNoeud);
 }
 
 /*
