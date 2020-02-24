@@ -194,6 +194,7 @@ Noeud * getNoeudPrioritaire(Noeud * noeud){
             nb_pas_parcourus ++;
         }else{
             // sinon, mise à jour de max
+            printf("Mise a jour du jeu max\n");
             b_valeur_courante = getBValeur(enfants[i]);
             if(b_valeur_courante > max){
                 prioritaire = enfants[i];
@@ -238,14 +239,17 @@ Coup * getMeilleurCoup(Noeud * noeud){
             valeurCourante = (float)(enfant->nb_victoires) / (float)(enfant->nb_simus);
             if(valeurCourante > max){
                 max = valeurCourante;
-                meilleurCoup = noeud->coup;
+                meilleurCoup = enfant->coup;
             }
         }
     }
     
     // si le meilleur coup n'a pas été trouvé, cela signifie qu'il n'y a pas
     // de fils qui a été exploré, on prend alors un coup aléatoire
-    if(meilleurCoup == NULL) meilleurCoup = noeud->enfants[rand()%nb_enfants]->coup;
+    if(meilleurCoup == NULL){
+        meilleurCoup = noeud->enfants[rand()%nb_enfants]->coup;
+        printf("meilleur coup aleatoire\n");
+    }
     
     return meilleurCoup;
 }
@@ -309,7 +313,7 @@ double getBValeur(Noeud * noeud){
         
         // calcul de la b_valeur en utilisant la constante C
         b_valeur = moyenne_recompense + C * exploration;
-        
+
         // inversion du signe en fonction du joueur
         if(noeud->joueur == JOUEUR_HUMAIN){
             b_valeur = -b_valeur;
