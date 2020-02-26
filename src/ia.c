@@ -357,7 +357,7 @@ FinDePartie effectuerMarchePseudoAleatoire(Noeud * noeud){
         do {
             Etat * e = copieEtat(etatCourant);
             jouerCoup(e, coups[test]);
-            if (testFin(e) == ORDI_GAGNE){
+            if (testFin(e) == ORDI_GAGNE && e->joueur == JOUEUR_ORDI){
                 estGagnant = 1;
                 break;
             }
