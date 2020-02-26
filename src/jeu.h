@@ -10,12 +10,12 @@
 /*
 	Header du script principal:
 
-        - Définition des constantes de paramètrage du jeu
+        - Dï¿½finition des constantes de paramï¿½trage du jeu
         - Macros
-        - Enumérations et structures
+        - Enumï¿½rations et structures
 */
 
-// Paramètres du jeu
+// Paramï¿½tres du jeu
 #define NB_COLONNE  7   // Taille du plateau
 #define NB_LIGNE    6
 
@@ -27,7 +27,7 @@
 
 #define LARGEUR_MAX NB_COLONNE 		// nb max de fils pour un noeud (= nb max de coups possibles)
 
-#define TEMPS 1		// temps de calcul pour un coup avec MCTS (en secondes)
+#define TEMPS 10		// temps de calcul pour un coup avec MCTS (en secondes)
 
 // macros
 #define AUTRE_JOUEUR(i) (1-(i))
@@ -37,22 +37,25 @@
 #define max(a, b)       ((a) < (b) ? (b) : (a))
 
 
-// Critères de fin de partie
+// Critï¿½res de fin de partie
 typedef enum {NON, MATCHNUL, ORDI_GAGNE, HUMAIN_GAGNE } FinDePartie;
 
-// Definition du type Etat (état/position du jeu)
+// Definition du type Etat (ï¿½tat/position du jeu)
 typedef struct EtatSt {
-	int joueur; // à qui de jouer ?
+	int joueur; // ï¿½ qui de jouer ?
 	char plateau[NB_LIGNE][NB_COLONNE]; // plateau du puissance 4
 	char nombre_pions[NB_COLONNE]; // tableau qui indique pour chaque colonne la hauteur courante
+    int version; // 1 : marchePseudoAleatoire (question 3); autre sinon
+
 } Etat;
+
 
 // Definition du type Coup
 typedef struct {
     int colonne; // colonne choisie pour le mouvement
 } Coup;
 
-// Définition des méthodes
+// Dï¿½finition des mï¿½thodes
 Coup ** coups_possibles( Etat * etat );
 Coup * nouveauCoup( int colonne );
 Coup * demanderCoup ();

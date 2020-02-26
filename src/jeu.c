@@ -263,9 +263,13 @@ void lancerJeu(){
     srand(time(0));
 	Etat * etat = etat_initial();
 
-	// Choisir qui commence :
-	printf("Qui commence (0 : humain, 1 : ordinateur) ? ");
-	scanf("%d", &(etat->joueur) );
+    printf("Tapez 1 pour la version de la question 3, autre sinon\n");
+    scanf("%d",  &etat->version);
+    // Choisir qui commence :
+    do {
+        printf("Qui commence (0 : humain, 1 : ordinateur) ? ");
+        scanf("%d", &(etat->joueur));
+    }while (etat->joueur != 0 && etat->joueur !=1);
 
 	// boucle de jeu
 	do {
@@ -280,6 +284,7 @@ void lancerJeu(){
             afficheJeu(etat);
 		}else {
 		    // tour de l'Ordinateur
+		    printf("Attente de l'adversaire ... \n");
 			ordijoue_mcts( etat, TEMPS );
 		}
 		fin = testFin( etat );

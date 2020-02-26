@@ -2,7 +2,7 @@
 #define IA_HEADER
 
 /*
-    Header de définition des structures et define
+    Header de dï¿½finition des structures et define
     pour le script concernant l'ia
 */
 
@@ -13,28 +13,29 @@
 // Definition du type Noeud
 typedef struct NoeudSt {
 
-	int joueur; // joueur qui a joué pour arriver ici
-	Coup * coup;   // coup joué par ce joueur pour arriver ici
+	int joueur; // joueur qui a jouï¿½ pour arriver ici
+	Coup * coup;   // coup jouï¿½ par ce joueur pour arriver ici
 
 	Etat * etat; // etat du jeu
 
 	struct NoeudSt * parent;
-	struct NoeudSt * enfants[LARGEUR_MAX]; // liste d'enfants : chaque enfant correspond à un coup possible
-	int nb_enfants;	// nb d'enfants présents dans la liste
+	struct NoeudSt * enfants[LARGEUR_MAX]; // liste d'enfants : chaque enfant correspond ï¿½ un coup possible
+	int nb_enfants;	// nb d'enfants prï¿½sents dans la liste
 
 	// POUR MCTS:
 	int nb_victoires;
 	int nb_simus;
     
-    int estParcouru; // booléen permettant d'indiquer si le noeud a déjà été parcouru ou non (0 = non, 1 = oui)
+    int estParcouru; // boolï¿½en permettant d'indiquer si le noeud a dï¿½jï¿½ ï¿½tï¿½ parcouru ou non (0 = non, 1 = oui)
 
 } Noeud;
 
-// Définition des méthodes
+// Dï¿½finition des mï¿½thodes
 void freeNoeud ( Noeud * noeud);
 void ordijoue_mcts(Etat * etat, int tempsmax);
 void remonterValeurVersRacine(Noeud * noeud, FinDePartie resultat);
 FinDePartie effectuerMarcheAleatoire(Noeud * noeud);
+FinDePartie effectuerMarchePseudoAleatoire(Noeud * noeud);
 Noeud * ajouterEnfant(Noeud * parent, Coup * coup);
 Noeud * nouveauNoeud (Noeud * parent, Coup * coup );
 Noeud * getNoeudPrioritaire(Noeud * noeud);
