@@ -10,12 +10,12 @@
 /*
 	Header du script principal:
 
-        - D�finition des constantes de param�trage du jeu
+        - Definition des constantes de parametrage du jeu
         - Macros
-        - Enum�rations et structures
+        - Enumerations et structures
 */
 
-// Param�tres du jeu
+// Parametres du jeu
 #define NB_COLONNE  7   // Taille du plateau
 #define NB_LIGNE    6
 
@@ -37,15 +37,16 @@
 #define max(a, b)       ((a) < (b) ? (b) : (a))
 
 
-// Crit�res de fin de partie
+// Criteres de fin de partie
 typedef enum {NON, MATCHNUL, ORDI_GAGNE, HUMAIN_GAGNE } FinDePartie;
 
-// Definition du type Etat (�tat/position du jeu)
+// Definition du type Etat (etat/position du jeu)
 typedef struct EtatSt {
-	int joueur; // � qui de jouer ?
+	int joueur; // a qui de jouer ?
 	char plateau[NB_LIGNE][NB_COLONNE]; // plateau du puissance 4
 	char nombre_pions[NB_COLONNE]; // tableau qui indique pour chaque colonne la hauteur courante
     int version; // 1 : marchePseudoAleatoire (question 3); autre sinon
+    int max; //1 : max , 2 : robust
 
 } Etat;
 
@@ -55,7 +56,7 @@ typedef struct {
     int colonne; // colonne choisie pour le mouvement
 } Coup;
 
-// D�finition des m�thodes
+// Definition des methodes
 Coup ** coups_possibles( Etat * etat );
 Coup * nouveauCoup( int colonne );
 Coup * demanderCoup ();

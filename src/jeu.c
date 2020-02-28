@@ -265,6 +265,14 @@ void lancerJeu(){
 
     printf("Tapez 1 pour la version de la question 3, autre sinon\n");
     scanf("%d",  &etat->version);
+
+    // Choisir le critere max ou robuste :
+    do {
+        printf("Quelle critere vous souhaitez (1 : max, 2 : robuste) ? \n");
+        scanf("%d", &(etat->max));
+    }while (etat->max != 1 && etat->max !=2);
+
+
     // Choisir qui commence :
     do {
         printf("Qui commence (0 : humain, 1 : ordinateur) ? ");

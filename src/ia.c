@@ -2,8 +2,8 @@
 #include "ia.h"
 
 /*
- * Cr�er un nouveau noeud en jouant un coup � partir d'un parent
- * utiliser nouveauNoeud(NULL, NULL) pour cr�er la racine
+ * Creer un nouveau noeud en jouant un coup a partir d'un parent
+ * utiliser nouveauNoeud(NULL, NULL) pour creer la racine
  */
 
 int victHumain , victOrdi;
@@ -33,8 +33,8 @@ Noeud * nouveauNoeud (Noeud * parent, Coup * coup ) {
 }
 
 /*
- * Ajouter un enfant � un parent en jouant un coup
- * retourne le pointeur sur l'enfant ajout�
+ * Ajouter un enfant a un parent en jouant un coup
+ * retourne le pointeur sur l'enfant ajoute
  */
 Noeud * ajouterEnfant(Noeud * parent, Coup * coup) {
 	Noeud * enfant = nouveauNoeud (parent, coup ) ;
@@ -44,9 +44,9 @@ Noeud * ajouterEnfant(Noeud * parent, Coup * coup) {
 }
 
 /*
- * Fonction qui cr�er les fils d'un noeud
+ * Fonction qui creer les fils d'un noeud
  *
- * @param noeud, dont il faut cr�er les fils, il faut que le noeud n'ait pas de fils
+ * @param noeud, dont il faut creer les fils, il faut que le noeud n'ait pas de fils
  */
 int creationFils(Noeud * noeud){
     Coup ** coups;
@@ -57,12 +57,12 @@ int creationFils(Noeud * noeud){
         ajouterEnfant(noeud, coups[k]);
         k++;
     }
-    // Lib�ration coups (tableau allou� qui contient les coups possibles)
+    // Liberation coups (tableau alloue qui contient les coups possibles)
     free(coups);
 }
 
 /*
- * M�thode de lib�ration des noeuds inutilis�s
+ * Methode de liberation des noeuds inutilises
  * ainsi que des ces enfants
  */
 void freeNoeud ( Noeud * noeud) {
@@ -89,16 +89,16 @@ void ordijoue_mcts(Etat * etat, int tempsmax) {
 	tic = clock();
 	int temps = 0;
 
-	// cr�er l'arbre de recherche
+	// creer l'arbre de recherche
 	Noeud * racine = nouveauNoeud(NULL, NULL);
     Noeud * courant;
     FinDePartie resultat;
 
-    // initialisation de l'�tat
+    // initialisation de l'etat
 	racine->etat = copieEtat(etat);
 
-    // impl�mentation de l'algorithme MCTS-UCT pour 
-    // d�terminer le meilleur coup ci-dessous
+    // implementation de l'algorithme MCTS-UCT pour
+    // determiner le meilleur coup ci-dessous
 	int iteration = 0;
     int noeudNonExploree;
     victHumain = 0;
@@ -111,24 +111,24 @@ void ordijoue_mcts(Etat * etat, int tempsmax) {
         noeudNonExploree = 0;
         courant = racine;
 
-        // parcours de l'arbre jusqu'� trouver un noeud non parcouru, ou � arriver � la fin du jeu, ou arriver
-        // � la fin de l'arbre
+        // parcours de l'arbre jusqu'a trouver un noeud non parcouru, ou a arriver a la fin du jeu, ou arriver
+        // a la fin de l'arbre
         do{
 //            printf("est parcouru\n");
-            // cr�ation des fils si le noeud n'a pas d�j� �t� parcouru
+            // creation des fils si le noeud n'a pas deja ete parcouru
             if(courant->estParcouru == 0){
                 creationFils(courant);
                 // le noeud courant est alors parcouru
                 courant->estParcouru = 1;
             }
 
-            // r�cup�ration du fils prioritaire pour le noeud courant
-            // si le noeud courant peut encore mener � des nouvelles configurations (coups possibles > 0)
+            // recuperation du fils prioritaire pour le noeud courant
+            // si le noeud courant peut encore mener a des nouvelles configurations (coups possibles > 0)
             if(courant->nb_enfants > 0) {
 //                printf("enfant > 0 donc recup noeud prioritaire\n");
                 courant = getNoeudPrioritaire(courant);
 
-                // si celui-ci n'a pas encore �t� parcouru on sort de la boucle.
+                // si celui-ci n'a pas encore ete parcouru on sort de la boucle.
                 if (courant->estParcouru == 0) {
 //                    printf("noeud non explore\n");
                     noeudNonExploree = 1;
@@ -136,9 +136,9 @@ void ordijoue_mcts(Etat * etat, int tempsmax) {
             }
         }while( ((resultat = testFin(courant->etat)) == NON && noeudNonExploree == 0 )|| courant->nb_victoires > 0);
 
-        // si on s'arr�te � cause d'un noeud non explor�
+        // si on s'arrete a cause d'un noeud non explore
         if(noeudNonExploree == 1){
-            // lancement d'une marche al�atoire
+            // lancement d'une marche aleatoire
             //printf("marche aleatoire\n");
             if(etat->version == 1) {
                 resultat = effectuerMarchePseudoAleatoire(courant);
@@ -147,16 +147,16 @@ void ordijoue_mcts(Etat * etat, int tempsmax) {
             }
             //printf("creation fils\n");
             creationFils(courant);
-            courant->estParcouru = 1; // et mise � jour du noeud explor�
+            courant->estParcouru = 1; // et mise a jour du noeud explore
         }
 
-        // on remonte les valeurs vers la racine en mettant � jour les noeuds
+        // on remonte les valeurs vers la racine en mettant a jour les noeuds
         if(resultat != NON) {
             //printf("remonter valeurs\n");
             remonterValeurVersRacine(courant, resultat);
         }
 
-        // r�cup�ration du temps pour v�rification
+        // recuperation du temps pour verification
 		toc = clock();
 		temps = (int)( ((double) (toc - tic)) / CLOCKS_PER_SEC );
 		iteration ++;
@@ -164,7 +164,7 @@ void ordijoue_mcts(Etat * etat, int tempsmax) {
 
 	// Jouer le meilleur premier coup
     //printf("recup meilleur coup\n");
-    Noeud * meilleurNoeud = getMeilleurNoeud(racine);
+    Noeud * meilleurNoeud = getMeilleurNoeud(racine , etat->max);
 	jouerCoup(etat, meilleurNoeud->coup);
 
     // affichage des informations concernant le nombre de simulations
@@ -176,17 +176,17 @@ void ordijoue_mcts(Etat * etat, int tempsmax) {
     pv = (double)victHumain * 100 / (victOrdi + victHumain);
     printf("\nPourcentage de victoire pour l'humain : %.2f %%\n" , pv);
 
-    // et l'estimation de la probabilit� de victoire
+    // et l'estimation de la probabilite de victoire
     printf("\nEstimation de la probabilite de victoire pour l'ordinateur : %f\n", (float)(meilleurNoeud->nb_victoires) / (float)(meilleurNoeud->nb_simus));
 
-	// Penser � lib�rer la m�moire :
+	// Penser a liberer la memoire :
 	freeNoeud(racine);
 }
 
 /*
- * Fonction qui permet de mettre � jour les valeurs
+ * Fonction qui permet de mettre a jour les valeurs
  * en partant d'un noeud
- * @param noeud � partir duquel on remonte les valeurs
+ * @param noeud e partir duquel on remonte les valeurs
  */
 void remonterValeurVersRacine(Noeud * noeud, FinDePartie resultat){
     Noeud * courant = noeud;
@@ -200,13 +200,13 @@ void remonterValeurVersRacine(Noeud * noeud, FinDePartie resultat){
 }
 
 /*
- * Fonction qui permet de r�cup�rer le noeud
- * prioritaire parmis les fils du noeud pass� en param�tre.
+ * Fonction qui permet de recuperer le noeud
+ * prioritaire parmis les fils du noeud passe en parametre.
  * 
- * Sachant que si un noeud parmis les fils n'a pas �t� explor�s, on r�cup�re
- * un tableau dans lequel on en prend un al�atoirement
+ * Sachant que si un noeud parmis les fils n'a pas ete explores, on recupere
+ * un tableau dans lequel on en prend un aleatoirement
  * 
- * @param noeud, le noeud duquel on veut r�cup�rer le fils prioritaire (noeud qui poss�de des enfants)
+ * @param noeud, le noeud duquel on veut recuperer le fils prioritaire (noeud qui possede des enfants)
  * @return le noeud le plus prioritaire
  */
 Noeud * getNoeudPrioritaire(Noeud * noeud){
@@ -214,19 +214,19 @@ Noeud * getNoeudPrioritaire(Noeud * noeud){
     Noeud ** enfants = noeud->enfants;
     int nb_enfants = noeud->nb_enfants;
     
-    int indices_pas_parcourus[nb_enfants];  // indices des noeuds pas d�j� parcourus dans enfants
+    int indices_pas_parcourus[nb_enfants];  // indices des noeuds pas deja parcourus dans enfants
     int nb_pas_parcourus = 0;
     double b_valeur_courante, max = LONG_MIN;
 
-    // v�rification de la pr�sence de noeuds non parcourus
+    // verification de la presence de noeuds non parcourus
     for(int i = 0; i < nb_enfants; i++){
-        // si pas parcouru trouv�
+        // si pas parcouru trouve
         if(enfants[i]->estParcouru == 0){
             // ajout dans tableau
             indices_pas_parcourus[nb_pas_parcourus] = i;
             nb_pas_parcourus ++;
         }else{
-            // sinon, mise � jour de max
+            // sinon, mise a jour de max
             b_valeur_courante = getBValeur(enfants[i]);
             if(b_valeur_courante > max){
                 prioritaire = enfants[i];
@@ -237,7 +237,7 @@ Noeud * getNoeudPrioritaire(Noeud * noeud){
     
     // si il y a des noeuds non parcourus
     if(nb_pas_parcourus > 0){
-        // on retourne l'un d'entre eux al�atoirement
+        // on retourne l'un d'entre eux aleatoirement
         prioritaire = enfants[
             indices_pas_parcourus[rand()%nb_pas_parcourus]
         ];
@@ -247,37 +247,45 @@ Noeud * getNoeudPrioritaire(Noeud * noeud){
 }
 
 /*
- * Fonction qui permet de r�cup�rer le meilleur coup
- * � partir d'un noeud racine. Donc parcours des noeuds
- * enfants, et r�cup�ration du coup de celui qui maximise
- * le crit�re voulu.
+ * Fonction qui permet de recuperer le meilleur coup
+ * a partir d'un noeud racine. Donc parcours des noeuds
+ * enfants, et recuperation du coup de celui qui maximise
+ * le critere voulu.
  * 
- * Crit�re courant : maximisation de la moyenne des r�compenses obtenus ( nb_victoires / nb_simus )
+ * Critere courant : maximisation de la moyenne des recompenses obtenus ( nb_victoires / nb_simus )
  * 
- * @param noeud, noeud � partir duquel on cherche le meilleur coup (parmis ceux de ses fils)
+ * @param noeud, noeud a partir duquel on cherche le meilleur coup (parmis ceux de ses fils)
+ * @param isMax, determine quelle critére le programme utilise (max ou robuste)
  * @return le meilleur coup
  */
-Noeud * getMeilleurNoeud(Noeud * noeud){
+Noeud * getMeilleurNoeud(Noeud * noeud , int isMax){
     float valeurCourante, max = INT_MIN;
     int nb_enfants = noeud->nb_enfants;
     Noeud * meilleurNoeud = NULL;
     Noeud * enfant;
     
-    // r�cup�ration du meilleur coup parmis les enfants du noeud fourni
+    // recuperation du meilleur coup parmis les enfants du noeud fourni
     for(int i = 0; i < nb_enfants; i++){
         enfant = noeud->enfants[i];
-        // les coups possibles sont ceux d'un enfant qui a �t� parcouru
+        // les coups possibles sont ceux d'un enfant qui a ete parcouru
         if(enfant->estParcouru == 1){
-            valeurCourante = (float)(enfant->nb_victoires) / (float)(enfant->nb_simus);
-            if(valeurCourante > max){
-                max = valeurCourante;
-                meilleurNoeud = enfant;
+            if (isMax == 1) {
+                valeurCourante = (float)(enfant->nb_victoires) / (float)(enfant->nb_simus);
+                if (valeurCourante > max) {
+                    max = valeurCourante;
+                    meilleurNoeud = enfant;
+                }
+            }else{
+                if (enfant->nb_simus > max) {
+                    max = enfant->nb_simus;
+                    meilleurNoeud = enfant;
+                }
             }
         }
     }
     
-    // si le meilleur coup n'a pas �t� trouv�, cela signifie qu'il n'y a pas
-    // de fils qui a �t� explor�, on prend alors un coup al�atoire
+    // si le meilleur coup n'a pas ete trouve, cela signifie qu'il n'y a pas
+    // de fils qui a ete explore, on prend alors un coup aleatoire
     if(meilleurNoeud == NULL){
         meilleurNoeud = noeud->enfants[rand()%nb_enfants];
     }
@@ -286,12 +294,12 @@ Noeud * getMeilleurNoeud(Noeud * noeud){
 }
 
 /*
- * Fonction qui permet d'effectuer la marche al�atoire, elle va parcourir al�atoirement
- * l'arbre en partant d'un noeud. On copie l'�tat actuel dans un autre �tat qui va nous servir
- * � parcourir l'arbre sans g�n�rer les fils. (juste un �tat � modifier)
+ * Fonction qui permet d'effectuer la marche aleatoire, elle va parcourir aleatoirement
+ * l'arbre en partant d'un noeud. On copie l'etat actuel dans un autre etat qui va nous servir
+ * a parcourir l'arbre sans generer les fils. (juste un etat a modifier)
  * 
- * @param noeud, � partir duquel on r�alise la marche al�atoire
- * @return fin de partie trouv�e
+ * @param noeud, a partir duquel on realise la marche aleatoire
+ * @return fin de partie trouvee
  */
 FinDePartie effectuerMarcheAleatoire(Noeud * noeud){
     Etat * etatCourant;
@@ -299,12 +307,12 @@ FinDePartie effectuerMarcheAleatoire(Noeud * noeud){
     FinDePartie estFini;
     int nbCoups;
 
-    // copie du bloc m�moire contenant l'�tat du noeud
+    // copie du bloc memoire contenant l'etat du noeud
     etatCourant = copieEtat(noeud->etat);
 
-    // tant qu'on arrive pas � la fin
+    // tant qu'on arrive pas a la fin
     while((estFini = testFin(etatCourant)) == NON){
-        // r�cup�ration d'un mouvement al�atoire parmi les coups possibles
+        // recupuration d'un mouvement aleatoire parmi les coups possibles
         coups = coups_possibles(etatCourant);
         nbCoups = 0;
         while ( coups[nbCoups] != NULL) {
@@ -312,11 +320,11 @@ FinDePartie effectuerMarcheAleatoire(Noeud * noeud){
         }
         // modification du noeud courant
         jouerCoup(etatCourant, coups[rand()%nbCoups]);
-        // lib�ration de la liste des coups
+        // liberation de la liste des coups
         free(coups);
     }
 
-    // lib�ration de l'�tat
+    // liberation de l'etat
     free(etatCourant);
 
     if (testFin(etatCourant) == ORDI_GAGNE){
@@ -329,6 +337,12 @@ FinDePartie effectuerMarcheAleatoire(Noeud * noeud){
     return estFini;
 }
 
+/*
+ * fonction effectuerMarcheAleatoire ameliore
+ * aleatoire inteligent (conctroler)
+ * @param noeud, a partir duquel on realise la marche aleatoire
+ * @return fin de partie trouvee
+ */
 
 
 FinDePartie effectuerMarchePseudoAleatoire(Noeud * noeud){
@@ -337,12 +351,12 @@ FinDePartie effectuerMarchePseudoAleatoire(Noeud * noeud){
     FinDePartie estFini;
     int nbCoups;
 
-    // copie du bloc m�moire contenant l'�tat du noeud
+    // copie du bloc memoire contenant l'etat du noeud
     etatCourant = copieEtat(noeud->etat);
 
-    // tant qu'on arrive pas � la fin
+    // tant qu'on arrive pas a la fin
     while((estFini = testFin(etatCourant)) == NON){
-        // r�cup�ration d'un mouvement al�atoire parmi les coups possibles
+        // recuperation d'un mouvement aleatoire parmi les coups possibles
         coups = coups_possibles(etatCourant);
         nbCoups = 0;
         while ( coups[nbCoups] != NULL) {
@@ -369,23 +383,18 @@ FinDePartie effectuerMarchePseudoAleatoire(Noeud * noeud){
             jouerCoup(etatCourant, coups[test]);
         }
 
-        //printf("no\n");
-
-        // lib�ration de la liste des coups
+        // liberation de la liste des coups
         free(coups);
     }
 
-    // lib�ration de l'�tat
+    // liberation de l'etat
     free(etatCourant);
 
-     //printf("before test \n");
     if (testFin(etatCourant) == ORDI_GAGNE){
         victOrdi++;
     }else{
         victHumain++;
     }
-
-   //printf("tested \n");
 
     return estFini;
 }
@@ -397,7 +406,7 @@ FinDePartie effectuerMarchePseudoAleatoire(Noeud * noeud){
 /*
  * Fonction qui calcule la B-valeur du noeud fourni.
  * 
- * Si le noeud fourni n'a pas de parent o� n'est pas d�j� explor�,
+ * Si le noeud fourni n'a pas de parent ou n'est pas deja explore,
  * on renvoit une b_valeur nulle.
  * 
  * @param noeud, noeud fourni
@@ -406,9 +415,9 @@ FinDePartie effectuerMarchePseudoAleatoire(Noeud * noeud){
 double getBValeur(Noeud * noeud){
     double moyenne_recompense, exploration, b_valeur = 0;
 
-    // si le noeud a d�j� �t� parcouru et qu'il n'est pas la racine
+    // si le noeud a deja ete parcouru et qu'il n'est pas la racine
     if(noeud->estParcouru == 1 && noeud->parent != NULL){
-        // calcul de la moyenne de la r�compense (nb_victoires / nb_simus) (exploitation)
+        // calcul de la moyenne de la recompense (nb_victoires / nb_simus) (exploitation)
         moyenne_recompense = (double)noeud->nb_victoires / (double)noeud->nb_simus;
         
         // calcul de l'exploration
